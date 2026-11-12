@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mr. Leo te preparó la Aventura del Pingüino Programador</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka para títulos infantiles y Nunito para lectura clara -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Configuración de tipografía y estilos personalizados para el juego */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 50%, #F0F9FF 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1, h2, .font-display {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Efectos de botones táctiles con sombra 3D infantil */
+        .btn-3d {
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2) !important;
+        }
+        .btn-3d:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        /* Animación de rebote suave para bloques agregados */
+        @keyframes popIn {
+            0% { transform: scale(0.4); opacity: 0; }
+            75% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .block-pop {
+            animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Animación de sacudida cuando el pingüino choca con una pared */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px) rotate(-6deg); }
+            40% { transform: translateX(8px) rotate(6deg); }
+            60% { transform: translateX(-6px) rotate(-4deg); }
+            80% { transform: translateX(6px) rotate(4deg); }
+        }
+        .shake-error {
+            animation: shake 0.45s ease-in-out;
+        }
+
+        /* Animación flotante para la meta (pez/iglú) */
+        @keyframes floatGoal {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .goal-float {
+            animation: floatGoal 1.8s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        /* Confeti simple en CSS/JS */
+        .confetti-piece {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            top: -20px;
+            z-index: 60;
+            pointer-events: none;
+            border-radius: 3px;
+        }
+
+        /* Barra de desplazamiento limpia para los niveles en pantallas pequeñas */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col justify-between min-h-screen w-full">
+
+    <!-- ENCABEZADO Y SELECTOR DE NIVELES -->
+    <header class="w-full max-w-5xl mx-auto px-2.5 sm:px-4 pt-2.5 sm:pt-3 pb-1.5">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-lg border-4 border-sky-200 p-3 md:px-6 flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3">
+            <!-- Título, Docente Mr. Leo e Icono -->
+            <div class="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto justify-center md:justify-start text-center md:text-left">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-sky-500 flex items-center justify-center shadow-md border-2 border-sky-600 shrink-0">
+                    <!-- Mini Pingüino SVG mirando al frente -->
+                    <svg viewBox="0 0 64 64" class="w-8 h-8 sm:w-9 sm:h-9">
+                        <ellipse cx="32" cy="34" rx="18" ry="20" fill="#1E293B"/>
+                        <ellipse cx="32" cy="38" rx="12" ry="14" fill="#FFFFFF"/>
+                        <circle cx="26" cy="24" r="3" fill="#FFFFFF"/>
+                        <circle cx="38" cy="24" r="3" fill="#FFFFFF"/>
+                        <circle cx="26.5" cy="24" r="1.5" fill="#0F172A"/>
+                        <circle cx="37.5" cy="24" r="1.5" fill="#0F172A"/>
+                        <polygon points="27,28 37,28 32,35" fill="#F59E0B"/>
+                        <ellipse cx="22" cy="52" rx="6" ry="3.5" fill="#F59E0B"/>
+                        <ellipse cx="42" cy="52" rx="6" ry="3.5" fill="#F59E0B"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
+                        <h1 class="text-base sm:text-xl md:text-2xl font-bold text-sky-900 leading-tight">
+                            Mr. Leo te preparó la Aventura del Pingüino Programador
+                        </h1>
+                    </div>
+                    <p class="text-[11px] sm:text-sm font-bold text-sky-600 mt-0.5">¡Imagina que estás dentro del pingüino! Gira a tu lado y avanza al frente</p>
+                </div>
+            </div>
+
+            <!-- Controles Superiores: Sonido y Ayuda -->
+            <div class="flex items-center justify-center gap-2 shrink-0 w-full md:w-auto">
+                <button id="btn-sound" onclick="toggleSound()" title="Activar o silenciar sonidos"
+                    class="btn-3d bg-amber-100 hover:bg-amber-200 text-amber-800 border-2 border-amber-300 shadow-[0_3px_0_#FCD34D] rounded-xl sm:rounded-2xl px-3 py-1.5 sm:py-2 font-bold text-xs sm:text-sm flex items-center gap-1.5">
+                    <span id="sound-icon" class="text-base sm:text-lg">🔊</span>
+                    <span id="sound-label">Sonido</span>
+                </button>
+                <button onclick="openHelpModal()" title="¿Cómo jugar?"
+                    class="btn-3d bg-sky-100 hover:bg-sky-200 text-sky-800 border-2 border-sky-300 shadow-[0_3px_0_#7DD3FC] rounded-xl sm:rounded-2xl px-3 py-1.5 sm:py-2 font-bold text-xs sm:text-sm flex items-center gap-1.5">
+                    <span class="text-base sm:text-lg">💡</span>
+                    <span>Ayuda</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- BARRA DE 10 NIVELES -->
+        <div class="mt-2.5 bg-white/85 rounded-2xl p-2 border-2 border-sky-200 shadow-sm flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <span class="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-sky-800 px-1.5 shrink-0">Niveles:</span>
+            <div id="level-selector" class="flex items-center gap-1.5 w-full justify-start sm:justify-between">
+                <!-- Botones del 1 al 10 generados por JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA PRINCIPAL DEL JUEGO -->
+    <main class="w-full max-w-5xl mx-auto px-2.5 sm:px-4 py-1.5 sm:py-2 flex-grow flex flex-col gap-2.5 sm:gap-3">
+        
+        <!-- SECCIÓN SUPERIOR: TABLERO DEL LABERINTO + PANEL DE COMANDOS -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-stretch md:items-center">
+            
+            <!-- COLUMNA IZQUIERDA (7 cols): LABERINTO -->
+            <div class="md:col-span-7 flex flex-col items-center">
+                <div class="w-full bg-white rounded-2xl sm:rounded-3xl shadow-xl border-4 border-slate-200 p-2.5 sm:p-5 flex flex-col items-center relative">
+                    
+                    <!-- Encabezado del Nivel -->
+                    <div class="w-full flex items-center justify-between gap-2 mb-2 px-1">
+                        <span id="level-badge" class="bg-sky-500 text-white font-display font-bold px-3 py-1 rounded-full text-xs sm:text-base shadow-sm">
+                            Nivel 1 de 10
+                        </span>
+                        <span id="level-hint-badge" class="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
+                            Meta: 15 bloques
+                        </span>
+                    </div>
+
+                    <!-- Banner de Retroalimentación / Mensajes amigables -->
+                    <div id="feedback-banner" class="w-full min-h-[42px] sm:min-h-[44px] mb-2 rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-center font-bold text-xs sm:text-base flex items-center justify-center transition-all duration-200 bg-sky-50 text-sky-800 border-2 border-sky-200">
+                        ¡Usa las flechas: ⬆️ Adelante, ⬇️ Atrás, ⬅️ Girar Izquierda, ➡️ Girar Derecha!
+                    </div>
+
+                    <!-- CONTENEDOR DEL LABERINTO (SVG + Pingüino animado) -->
+                    <div id="maze-wrapper" class="relative w-full max-w-[310px] sm:max-w-[370px] md:max-w-[400px] aspect-square bg-white rounded-2xl p-1.5 sm:p-2 flex items-center justify-center">
+                        <!-- SVG donde se dibujan las paredes gruesas gris oscuro estilo ficha escolar -->
+                        <svg id="maze-svg" viewBox="0 0 400 400" class="w-full h-full overflow-visible">
+                            <!-- Capa de cuadrícula suave de ayuda -->
+                            <g id="grid-layer"></g>
+                            <!-- Capa de meta (Salida y Pez/Bandera) -->
+                            <g id="goal-layer"></g>
+                            <!-- Capa de paredes gruesas -->
+                            <g id="walls-layer"></g>
+                        </svg>
+
+                        <!-- Personaje Pingüino (Capa HTML/SVG posicionada dinámicamente para animaciones suaves) -->
+                        <div id="penguin-actor" class="absolute transition-all duration-300 ease-in-out pointer-events-none flex items-center justify-center z-20"
+                             style="width: 20%; height: 20%; left: 0%; top: 0%;">
+                            <div id="penguin-sprite" class="w-full h-full transition-transform duration-300 ease-out flex items-center justify-center relative">
+                                <!-- Indicador de dirección frontal (Flecha/Brújula clara para niños) -->
+                                <svg viewBox="0 0 100 100" class="w-[92%] h-[92%] drop-shadow-md">
+                                    <!-- Flecha guía naranja brillante frente al pico para ver hacia dónde mira -->
+                                    <polygon points="50,1 42,12 58,12" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5"/>
+                                    <!-- Patitas naranjas asomando al frente -->
+                                    <path d="M 28 28 Q 22 16 33 18 Q 38 19 39 28 Z" fill="#F59E0B" stroke="#B45309" stroke-width="2"/>
+                                    <path d="M 72 28 Q 78 16 67 18 Q 62 19 61 28 Z" fill="#F59E0B" stroke="#B45309" stroke-width="2"/>
+                                    <!-- Aletas laterales (Izquierda y Derecha del pingüino) -->
+                                    <ellipse cx="14" cy="56" rx="12" ry="6" transform="rotate(-15 14 56)" fill="#1E293B"/>
+                                    <ellipse cx="86" cy="56" rx="12" ry="6" transform="rotate(15 86 56)" fill="#1E293B"/>
+                                    <!-- Cuerpo ovalado negro -->
+                                    <ellipse cx="50" cy="58" rx="34" ry="28" fill="#1E293B"/>
+                                    <!-- Pancita / Cara blanca frontal -->
+                                    <path d="M 26 46 C 26 26, 74 26, 74 46 C 74 56, 26 56, 26 46 Z" fill="#FFFFFF"/>
+                                    <!-- Ojos expresivos mirando al frente -->
+                                    <ellipse cx="41" cy="44" rx="5.5" ry="7" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.5"/>
+                                    <ellipse cx="59" cy="44" rx="5.5" ry="7" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.5"/>
+                                    <circle cx="42" cy="42" r="3" fill="#0F172A"/>
+                                    <circle cx="58" cy="42" r="3" fill="#0F172A"/>
+                                    <circle cx="43" cy="40.5" r="1.1" fill="#FFFFFF"/>
+                                    <circle cx="59" cy="40.5" r="1.1" fill="#FFFFFF"/>
+                                    <!-- Pico naranja apuntando hacia el frente del pingüino -->
+                                    <path d="M 41 32 Q 50 14 59 32 Q 50 37 41 32 Z" fill="#FBBF24" stroke="#D97706" stroke-width="2"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA (5 cols): CONTROL DIRECCIONAL Y EJECUCIÓN -->
+            <div class="md:col-span-5 flex flex-col gap-3">
+                <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border-4 border-sky-200 p-3 sm:p-4 flex flex-col items-center">
+                    <h2 class="text-base sm:text-lg font-bold text-sky-900 mb-0.5 sm:mb-1 flex items-center gap-2">
+                        <span>🎮</span> Comandos del Pingüino
+                    </h2>
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-bold mb-2.5 sm:mb-3 text-center">
+                        ⬆️⬇️ Avanzan o retroceden • ⬅️➡️ Giran sobre su lugar
+                    </p>
+
+                    <!-- Cruceta de Dirección Grande para Niños (Flechas como en el teclado de computadora) -->
+                    <div class="grid grid-cols-3 gap-2 sm:gap-2.5 w-full max-w-[270px] sm:max-w-[290px] my-1">
+                        <div></div>
+                        <!-- ADELANTE (Avanza hacia donde mira) -->
+                        <button id="btn-dir-UP" onclick="addCommand('FORWARD')"
+                            class="btn-3d bg-sky-500 hover:bg-sky-400 text-white border-2 border-sky-600 shadow-[0_4px_0_#0284C7] sm:shadow-[0_5px_0_#0284C7] rounded-2xl py-2.5 sm:py-3 px-2 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-2xl sm:text-3xl leading-none">⬆️</span>
+                            <span class="text-[11px] sm:text-xs font-extrabold mt-1">Adelante</span>
+                        </button>
+                        <div></div>
+
+                        <!-- GIRAR IZQUIERDA (Flecha normal izquierda como teclado) -->
+                        <button id="btn-dir-LEFT" onclick="addCommand('TURN_LEFT')"
+                            class="btn-3d bg-indigo-500 hover:bg-indigo-400 text-white border-2 border-indigo-600 shadow-[0_4px_0_#4338CA] sm:shadow-[0_5px_0_#4338CA] rounded-2xl py-2.5 sm:py-3 px-1.5 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-2xl sm:text-3xl leading-none">⬅️</span>
+                            <span class="text-[10px] sm:text-[11px] font-extrabold mt-1 leading-tight">Girar Izq.</span>
+                        </button>
+
+                        <!-- ATRÁS (Retrocede sin girar) -->
+                        <button id="btn-dir-DOWN" onclick="addCommand('BACKWARD')"
+                            class="btn-3d bg-amber-500 hover:bg-amber-400 text-white border-2 border-amber-600 shadow-[0_4px_0_#D97706] sm:shadow-[0_5px_0_#D97706] rounded-2xl py-2.5 sm:py-3 px-2 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-2xl sm:text-3xl leading-none">⬇️</span>
+                            <span class="text-[11px] sm:text-xs font-extrabold mt-1">Atrás</span>
+                        </button>
+
+                        <!-- GIRAR DERECHA (Flecha normal derecha como teclado) -->
+                        <button id="btn-dir-RIGHT" onclick="addCommand('TURN_RIGHT')"
+                            class="btn-3d bg-teal-500 hover:bg-teal-400 text-white border-2 border-teal-600 shadow-[0_4px_0_#0F766E] sm:shadow-[0_5px_0_#0F766E] rounded-2xl py-2.5 sm:py-3 px-1.5 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-2xl sm:text-3xl leading-none">➡️</span>
+                            <span class="text-[10px] sm:text-[11px] font-extrabold mt-1 leading-tight">Girar Der.</span>
+                        </button>
+                    </div>
+
+                    <!-- Botones de Acción: Ejecutar, Borrar Último, Reiniciar -->
+                    <div class="w-full flex flex-col gap-2 sm:gap-2.5 mt-3 sm:mt-4">
+                        <button id="btn-run" onclick="runSequence()"
+                            class="btn-3d w-full bg-emerald-500 hover:bg-emerald-400 text-white border-2 border-emerald-600 shadow-[0_4px_0_#059669] sm:shadow-[0_5px_0_#059669] rounded-2xl py-3 sm:py-3.5 px-4 font-display font-bold text-base sm:text-xl flex items-center justify-center gap-2 tracking-wide touch-manipulation">
+                            <span>▶️</span> Ejecutar
+                        </button>
+
+                        <div class="grid grid-cols-2 gap-2 sm:gap-2.5">
+                            <button id="btn-undo" onclick="removeLastCommand()"
+                                class="btn-3d bg-orange-100 hover:bg-orange-200 text-orange-800 border-2 border-orange-300 shadow-[0_4px_0_#FDBA74] rounded-2xl py-2.5 px-2.5 sm:px-3 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 touch-manipulation">
+                                <span>⌫</span> Borrar
+                            </button>
+                            <button id="btn-clear" onclick="clearCommands()"
+                                class="btn-3d bg-rose-100 hover:bg-rose-200 text-rose-800 border-2 border-rose-300 shadow-[0_4px_0_#FDA4AF] rounded-2xl py-2.5 px-2.5 sm:px-3 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 touch-manipulation">
+                                <span>🔄</span> Reiniciar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN INFERIOR: CADENA DE CÓDIGO (CASILLAS REDONDEADAS COMO EN LA FICHA) -->
+        <section class="w-full bg-white rounded-2xl sm:rounded-3xl shadow-xl border-4 border-slate-200 p-2.5 sm:p-4 mb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <span class="text-lg sm:text-xl">🧩</span>
+                    <h2 class="text-sm sm:text-lg font-bold text-slate-800">Tu Cadena de Código:</h2>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-bold">
+                    <span class="hidden sm:inline text-slate-500">Toca un bloque para quitarlo</span>
+                    <span id="step-counter" class="bg-sky-100 text-sky-800 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-sky-300">
+                        0 / 15 bloques
+                    </span>
+                </div>
+            </div>
+
+            <!-- Contenedor de los cuadros redondeados secuenciales -->
+            <div id="code-slots-container" class="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2.5 min-h-[68px] sm:min-h-[76px] p-2 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300">
+                <!-- Generado dinámicamente por JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DE VICTORIA DEL NIVEL -->
+    <div id="victory-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl border-4 border-amber-300 shadow-2xl max-w-md w-full p-5 sm:p-6 text-center transform transition-all">
+            <div class="text-4xl sm:text-6xl mb-2">👨‍🏫🏆🐧</div>
+            <h2 id="victory-title" class="text-xl sm:text-3xl font-bold text-sky-900 mb-1.5 leading-snug">
+                ¡Mr. Leo te felicita por tu logro!
+            </h2>
+            <p id="victory-subtitle" class="text-slate-600 font-bold text-sm sm:text-base mb-3 sm:mb-4">
+                ¡Vamos al siguiente Nivel!
+            </p>
+            
+            <!-- Estrellas ganadas -->
+            <div id="victory-stars" class="flex justify-center gap-2 text-3xl sm:text-4xl mb-3 sm:mb-4">
+                <span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+
+            <!-- Resumen de la cadena usada -->
+            <div class="bg-sky-50 rounded-2xl p-2.5 sm:p-3 border-2 border-sky-200 mb-4 sm:mb-5">
+                <p class="text-[11px] sm:text-xs font-extrabold uppercase text-sky-700 mb-1.5">Código ejecutado con éxito:</p>
+                <div id="victory-code-summary" class="flex flex-wrap justify-center gap-1 sm:gap-1.5 text-base sm:text-lg max-h-24 overflow-y-auto"></div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center">
+                <button onclick="replayLevel()"
+                    class="btn-3d bg-sky-100 hover:bg-sky-200 text-sky-800 border-2 border-sky-300 shadow-[0_4px_0_#7DD3FC] rounded-2xl px-4 py-2.5 sm:py-3 font-bold text-sm sm:text-base">
+                    🔄 Repetir Nivel
+                </button>
+                <button id="btn-next-level" onclick="nextLevel()"
+                    class="btn-3d bg-emerald-500 hover:bg-emerald-400 text-white border-2 border-emerald-600 shadow-[0_4px_0_#059669] rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 font-display font-bold text-base sm:text-lg flex items-center justify-center gap-2">
+                    <span>Vamos al siguiente Nivel</span> <span>➡️</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE INSTRUCCIONES PARA NIÑOS / DOCENTES -->
+    <div id="help-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl border-4 border-sky-300 shadow-2xl max-w-md w-full p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xl sm:text-2xl font-bold text-sky-900 flex items-center gap-2">
+                    <span>🐧</span> Guía de Mr. Leo
+                </h2>
+                <button onclick="closeHelpModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 font-bold text-slate-600">✕</button>
+            </div>
+            <ol class="space-y-2.5 text-slate-700 font-bold text-xs sm:text-base">
+                <li class="flex items-start gap-2.5 bg-sky-50 p-2.5 rounded-2xl">
+                    <span class="bg-sky-500 text-white w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs sm:text-sm">1</span>
+                    <span>¡Imagina que estás dentro del pingüino! Mira siempre hacia donde apunta su <strong>pico y flecha roja</strong>.</span>
+                </li>
+                <li class="flex items-start gap-2.5 bg-indigo-50 p-2.5 rounded-2xl">
+                    <span class="bg-indigo-500 text-white w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs sm:text-sm">2</span>
+                    <span><strong>⬅️ Izquierda</strong> y <strong>➡️ Derecha</strong> solo <strong>giran</strong> al pingüino en su mismo cuadrito (no avanzan).</span>
+                </li>
+                <li class="flex items-start gap-2.5 bg-amber-50 p-2.5 rounded-2xl">
+                    <span class="bg-amber-500 text-white w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs sm:text-sm">3</span>
+                    <span><strong>⬆️ Adelante</strong> avanza 1 paso hacia donde mira el pingüino, y <strong>⬇️ Atrás</strong> retrocede 1 paso.</span>
+                </li>
+                <li class="flex items-start gap-2.5 bg-emerald-50 p-2.5 rounded-2xl">
+                    <span class="bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs sm:text-sm">4</span>
+                    <span>Presiona <strong>Enter</strong> o el botón verde <strong>▶️ Ejecutar</strong> para probar tu programa.</span>
+                </li>
+            </ol>
+            <button onclick="closeHelpModal()"
+                class="btn-3d mt-5 w-full bg-sky-500 hover:bg-sky-400 text-white border-2 border-sky-600 shadow-[0_4px_0_#0284C7] rounded-2xl py-3 font-display font-bold text-base sm:text-lg">
+                ¡Entendido, a programar!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * SINTETIZADOR DE SONIDOS INFANTILES (WEB AUDIO API)
+         */
+        class SoundFX {
+            constructor() {
+                this.enabled = true;
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            playTone(freq, duration = 0.12, type = 'sine', delay = 0, vol = 0.15) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime + delay;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + duration);
+            }
+            click(cmd) {
+                const map = { FORWARD: 523.25, TURN_RIGHT: 587.33, BACKWARD: 440.00, TURN_LEFT: 493.88 };
+                this.playTone(map[cmd] || 500, 0.1, 'triangle', 0, 0.14);
+            }
+            delete() {
+                this.playTone(330, 0.09, 'sine', 0, 0.12);
+                this.playTone(260, 0.11, 'sine', 0.06, 0.12);
+            }
+            step() {
+                this.playTone(392, 0.08, 'sine', 0, 0.12);
+            }
+            turn() {
+                this.playTone(493.88, 0.09, 'triangle', 0, 0.12);
+            }
+            bump() {
+                this.playTone(150, 0.25, 'sawtooth', 0, 0.18);
+                this.playTone(110, 0.3, 'sawtooth', 0.1, 0.18);
+            }
+            victory() {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((n, i) => this.playTone(n, 0.22, 'triangle', i * 0.11, 0.18));
+            }
+        }
+        const SFX = new SoundFX();
+
+        /**
+         * DEFINICIÓN DE LOS 10 NIVELES PROGRESIVOS PARA NIÑOS DE 6 A 8 AÑOS
+         * Ordenados estrictamente desde el más fácil (Nivel 1) hasta el más difícil (Nivel 10).
+         * El pingüino siempre inicia mirando al FRENTE ('UP') desde la perspectiva del estudiante.
+         */
+        const LEVELS = [
+            {
+                id: 1,
+                name: "Nivel 1: Línea Recta",
+                size: 3,
+                start: { r: 2, c: 1, dir: 'UP' },
+                exit: { r: 0, c: 1, side: 'TOP' },
+                optimalSteps: 2,
+                maxSlots: 5,
+                hWalls: [],
+                vWalls: [[0,0], [1,0], [2,0], [0,1], [1,1], [2,1]]
+            },
+            {
+                id: 2,
+                name: "Nivel 2: Primer Giro",
+                size: 3,
+                start: { r: 2, c: 0, dir: 'UP' },
+                exit: { r: 0, c: 2, side: 'TOP' },
+                optimalSteps: 5,
+                maxSlots: 8,
+                hWalls: [[1,0], [1,1]],
+                vWalls: []
+            },
+            {
+                id: 3,
+                name: "Nivel 3: El Giro del Hielo",
+                size: 3,
+                start: { r: 2, c: 1, dir: 'UP' },
+                exit: { r: 0, c: 1, side: 'TOP' },
+                optimalSteps: 8,
+                maxSlots: 11,
+                hWalls: [[1,1]],
+                vWalls: [[0,1], [1,1]]
+            },
+            {
+                id: 4,
+                name: "Nivel 4: El Puente Nevado",
+                size: 4,
+                start: { r: 3, c: 3, dir: 'UP' },
+                exit: { r: 0, c: 0, side: 'TOP' },
+                optimalSteps: 9,
+                maxSlots: 12,
+                hWalls: [[2,2], [2,3], [0,1], [0,2]],
+                vWalls: [[1,0], [2,0]]
+            },
+            {
+                id: 5,
+                name: "Nivel 5: Escalera Polar",
+                size: 4,
+                start: { r: 3, c: 0, dir: 'UP' },
+                exit: { r: 0, c: 3, side: 'RIGHT' },
+                optimalSteps: 11,
+                maxSlots: 14,
+                hWalls: [[2,1], [2,2], [1,0], [1,2], [0,1]],
+                vWalls: [[3,0], [1,1]]
+            },
+            {
+                id: 6,
+                name: "Nivel 6: La Cueva de Cristal",
+                size: 4,
+                start: { r: 3, c: 2, dir: 'UP' },
+                exit: { r: 0, c: 3, side: 'TOP' },
+                optimalSteps: 12,
+                maxSlots: 15,
+                hWalls: [[2,1], [2,2], [1,2], [1,3], [0,1]],
+                vWalls: [[2,0], [1,0]]
+            },
+            {
+                id: 7,
+                name: "Nivel 7: Laberinto Clásico",
+                size: 4,
+                start: { r: 3, c: 2, dir: 'UP' },
+                exit: { r: 0, c: 1, side: 'TOP' },
+                optimalSteps: 13,
+                maxSlots: 16,
+                hWalls: [[2,0], [2,2], [1,1]],
+                vWalls: [[1,1], [2,0], [1,2], [2,2]]
+            },
+            {
+                id: 8,
+                name: "Nivel 8: Zig-Zag Ártico",
+                size: 4,
+                start: { r: 3, c: 0, dir: 'UP' },
+                exit: { r: 0, c: 0, side: 'TOP' },
+                optimalSteps: 15,
+                maxSlots: 18,
+                hWalls: [[2,0], [2,1], [1,1], [1,2], [0,0], [0,1]],
+                vWalls: []
+            },
+            {
+                id: 9,
+                name: "Nivel 9: Gran Expedición",
+                size: 5,
+                start: { r: 4, c: 0, dir: 'UP' },
+                exit: { r: 0, c: 4, side: 'TOP' },
+                optimalSteps: 15,
+                maxSlots: 18,
+                hWalls: [[3,0], [3,1], [3,2], [1,2], [1,3], [1,4]],
+                vWalls: [[2,1], [2,2], [0,1]]
+            },
+            {
+                id: 10,
+                name: "Nivel 10: Espiral Maestra",
+                size: 5,
+                start: { r: 4, c: 2, dir: 'UP' },
+                exit: { r: 2, c: 2, side: 'TOP' },
+                optimalSteps: 19,
+                maxSlots: 22,
+                hWalls: [[3,1], [3,2], [3,3], [0,1], [0,2], [0,3], [1,2]],
+                vWalls: [[1,0], [2,0], [3,0], [1,3], [2,3], [2,1]]
+            }
+        ];
+
+        // Metadatos visuales de cada bloque de programación relativa (con flechas normales como teclado)
+        const CMD_META = {
+            FORWARD:    { arrow: '⬆️', label: 'Adelante',  bg: 'bg-sky-500',    border: 'border-sky-700',    shadow: 'shadow-[0_4px_0_#0369A1]' },
+            BACKWARD:   { arrow: '⬇️', label: 'Atrás',     bg: 'bg-amber-500',  border: 'border-amber-700',  shadow: 'shadow-[0_4px_0_#B45309]' },
+            TURN_LEFT:  { arrow: '⬅️', label: 'Izquierda', bg: 'bg-indigo-500', border: 'border-indigo-700', shadow: 'shadow-[0_4px_0_#3730A3]' },
+            TURN_RIGHT: { arrow: '➡️', label: 'Derecha',   bg: 'bg-teal-500',   border: 'border-teal-700',   shadow: 'shadow-[0_4px_0_#115E59]' }
+        };
+
+        // Vectores cardinales absolutos en el tablero y rotación visual (0° = mirando al frente/arriba)
+        const DIR_VECTORS = {
+            UP:    { dr: -1, dc: 0, deg: 0 },
+            RIGHT: { dr: 0,  dc: 1, deg: 90 },
+            DOWN:  { dr: 1,  dc: 0, deg: 180 },
+            LEFT:  { dr: 0,  dc: -1, deg: -90 }
+        };
+
+        // Orden horario para calcular giros relativos de 90°
+        const COMPASS_ORDER = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
+
+        // Estado global del juego
+        let currentLevelIdx = 0;
+        let commandQueue = [];
+        let isRunning = false;
+        let completedLevels = new Set();
+
+        // Posición y orientación actual del pingüino
+        let penguinPos = { r: 0, c: 0, dir: 'UP' };
+        let visualRotation = 0;
+
+        // Inicialización al cargar la página
+        window.onload = function () {
+            renderLevelSelector();
+            loadLevel(0);
+            setupKeyboardListeners();
+        };
+
+        /**
+         * Renderiza los botones de los 10 niveles en la barra superior
+         */
+        function renderLevelSelector() {
+            const container = document.getElementById('level-selector');
+            container.innerHTML = '';
+
+            LEVELS.forEach((lvl, idx) => {
+                const isCurrent = idx === currentLevelIdx;
+                const isDone = completedLevels.has(lvl.id);
+
+                const btn = document.createElement('button');
+                btn.onclick = () => {
+                    if (!isRunning) loadLevel(idx);
+                };
+
+                let classes = 'btn-3d w-8 h-8 sm:w-10 sm:h-10 rounded-xl font-display font-bold text-xs sm:text-base flex items-center justify-center shrink-0 border-2 ';
+                if (isCurrent) {
+                    classes += 'bg-sky-500 text-white border-sky-700 shadow-[0_3px_0_#0369A1] scale-105';
+                } else if (isDone) {
+                    classes += 'bg-emerald-100 text-emerald-800 border-emerald-400 shadow-[0_3px_0_#34D399]';
+                } else {
+                    classes += 'bg-slate-100 hover:bg-sky-100 text-slate-700 border-slate-300 shadow-[0_3px_0_#CBD5E1]';
+                }
+
+                btn.className = classes;
+                btn.innerHTML = isDone && !isCurrent ? `✓${lvl.id}` : `${lvl.id}`;
+                btn.title = lvl.name;
+                container.appendChild(btn);
+            });
+        }
+
+        /**
+         * Carga un nivel específico, dibuja su laberinto y reinicia al pingüino
+         */
+        function loadLevel(idx) {
+            currentLevelIdx = idx;
+            const level = LEVELS[currentLevelIdx];
+            commandQueue = [];
+            isRunning = false;
+
+            document.getElementById('level-badge').textContent = `Nivel ${level.id} de ${LEVELS.length}`;
+            document.getElementById('level-hint-badge').textContent = `Meta ideal: ${level.optimalSteps} bloques`;
+            setFeedback('¡Usa las flechas: ⬆️ Adelante, ⬇️ Atrás, ⬅️ Girar Izquierda, ➡️ Girar Derecha!', 'info');
+
+            renderLevelSelector();
+            drawMaze(level);
+            resetPenguinToStart(level);
+            renderCodeSlots();
+            setControlsDisabled(false);
+        }
+
+        /**
+         * Dibuja el laberinto en SVG con paredes gruesas gris oscuro (#525252) y aberturas de entrada/salida
+         */
+        function drawMaze(level) {
+            const N = level.size;
+            const pad = 24;
+            const boardSize = 400 - pad * 2;
+            const cell = boardSize / N;
+            const wallColor = '#525252';
+            const wallThickness = N <= 4 ? 12 : 10;
+
+            const gridLayer = document.getElementById('grid-layer');
+            const goalLayer = document.getElementById('goal-layer');
+            const wallsLayer = document.getElementById('walls-layer');
+
+            gridLayer.innerHTML = '';
+            goalLayer.innerHTML = '';
+            wallsLayer.innerHTML = '';
+
+            // 1. Cuadrícula guía sutil para ayudar al niño a contar pasos
+            for (let r = 0; r < N; r++) {
+                for (let c = 0; c < N; c++) {
+                    const isGoalCell = (r === level.exit.r && c === level.exit.c);
+                    const rect = createSvgEl('rect', {
+                        x: pad + c * cell + 3,
+                        y: pad + r * cell + 3,
+                        width: cell - 6,
+                        height: cell - 6,
+                        rx: 10,
+                        fill: isGoalCell ? '#D1FAE5' : '#F8FAFC',
+                        stroke: isGoalCell ? '#10B981' : '#E2E8F0',
+                        'stroke-width': isGoalCell ? 3 : 2,
+                        'stroke-dasharray': isGoalCell ? 'none' : '4 4'
+                    });
+                    gridLayer.appendChild(rect);
+                }
+            }
+
+            // 2. Meta visual: Pez SVG ilustrado centrado dentro del cuadradito verde de salida
+            const gx = pad + level.exit.c * cell + cell / 2;
+            const gy = pad + level.exit.r * cell + cell / 2;
+            const s = (cell * 0.62) / 64;
+            const goalGroup = createSvgEl('g', {
+                transform: `translate(${gx}, ${gy})`
+            });
+            goalGroup.innerHTML = `
+                <g class="goal-float">
+                    <g transform="scale(${s}) translate(-32, -32)">
+                        <!-- Cola del pez -->
+                        <polygon points="48,32 62,18 59,32 62,46" fill="#0284C7" stroke="#0369A1" stroke-width="2.5" stroke-linejoin="round"/>
+                        <!-- Aleta dorsal -->
+                        <path d="M 24 19 Q 32 8 40 19 Z" fill="#38BDF8" stroke="#0369A1" stroke-width="2" stroke-linejoin="round"/>
+                        <!-- Aleta inferior -->
+                        <path d="M 26 45 Q 32 54 38 45 Z" fill="#38BDF8" stroke="#0369A1" stroke-width="2" stroke-linejoin="round"/>
+                        <!-- Cuerpo del pez -->
+                        <ellipse cx="28" cy="32" rx="22" ry="14" fill="#38BDF8" stroke="#0369A1" stroke-width="2.5"/>
+                        <!-- Franjas decorativas -->
+                        <path d="M 26 20 Q 29 32 26 44" fill="none" stroke="#E0F2FE" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M 34 21 Q 37 32 34 43" fill="none" stroke="#E0F2FE" stroke-width="3" stroke-linecap="round"/>
+                        <!-- Ojo y sonrisa -->
+                        <circle cx="15" cy="29" r="3.5" fill="#FFFFFF"/>
+                        <circle cx="14.2" cy="29" r="1.8" fill="#0F172A"/>
+                        <path d="M 8 34 Q 12 37 15 34" fill="none" stroke="#0369A1" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+                </g>
+            `;
+            goalLayer.appendChild(goalGroup);
+
+            // Helper para dibujar segmentos de pared con extremos cuadrados limpios
+            const addWall = (x1, y1, x2, y2) => {
+                const line = createSvgEl('line', {
+                    x1, y1, x2, y2,
+                    stroke: wallColor,
+                    'stroke-width': wallThickness,
+                    'stroke-linecap': 'square'
+                });
+                wallsLayer.appendChild(line);
+            };
+
+            // 3. Bordes exteriores dejando abierta la entrada (abajo) y la salida
+            for (let c = 0; c < N; c++) {
+                const isExitTop = (level.exit.side === 'TOP' && level.exit.r === 0 && level.exit.c === c);
+                if (!isExitTop) {
+                    addWall(pad + c * cell, pad, pad + (c + 1) * cell, pad);
+                }
+            }
+            for (let c = 0; c < N; c++) {
+                const isStartBottom = (level.start.r === N - 1 && level.start.c === c);
+                const isExitBottom = (level.exit.side === 'BOTTOM' && level.exit.r === N - 1 && level.exit.c === c);
+                if (!isStartBottom && !isExitBottom) {
+                    addWall(pad + c * cell, pad + N * cell, pad + (c + 1) * cell, pad + N * cell);
+                }
+            }
+            for (let r = 0; r < N; r++) {
+                const isExitLeft = (level.exit.side === 'LEFT' && level.exit.c === 0 && level.exit.r === r);
+                if (!isExitLeft) {
+                    addWall(pad, pad + r * cell, pad, pad + (r + 1) * cell);
+                }
+            }
+            for (let r = 0; r < N; r++) {
+                const isExitRight = (level.exit.side === 'RIGHT' && level.exit.c === N - 1 && level.exit.r === r);
+                if (!isExitRight) {
+                    addWall(pad + N * cell, pad + r * cell, pad + N * cell, pad + (r + 1) * cell);
+                }
+            }
+
+            // 4. Paredes internas horizontales (debajo de celda [r, c])
+            level.hWalls.forEach(([r, c]) => {
+                const y = pad + (r + 1) * cell;
+                addWall(pad + c * cell, y, pad + (c + 1) * cell, y);
+            });
+
+            // 5. Paredes internas verticales (a la derecha de celda [r, c])
+            level.vWalls.forEach(([r, c]) => {
+                const x = pad + (c + 1) * cell;
+                addWall(x, pad + r * cell, x, pad + (r + 1) * cell);
+            });
+        }
+
+        function createSvgEl(tag, attrs) {
+            const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            for (const [k, v] of Object.entries(attrs)) {
+                el.setAttribute(k, v);
+            }
+            return el;
+        }
+
+        /**
+         * Ubica al pingüino en la posición inicial mirando al frente ('UP', 0°)
+         */
+        function resetPenguinToStart(level) {
+            penguinPos = {
+                r: level.start.r,
+                c: level.start.c,
+                dir: level.start.dir || 'UP'
+            };
+            visualRotation = DIR_VECTORS[penguinPos.dir].deg;
+            updatePenguinVisual(false);
+        }
+
+        /**
+         * Actualiza la posición y rotación del sprite del pingüino sobre el tablero
+         */
+        function updatePenguinVisual(animate = true) {
+            const level = LEVELS[currentLevelIdx];
+            const N = level.size;
+            const padPct = (24 / 400) * 100;
+            const boardPct = 100 - padPct * 2;
+            const cellPct = boardPct / N;
+
+            const actor = document.getElementById('penguin-actor');
+            const sprite = document.getElementById('penguin-sprite');
+
+            actor.style.transition = animate ? 'all 0.32s cubic-bezier(0.22, 1, 0.36, 1)' : 'none';
+            actor.style.width = `${cellPct}%`;
+            actor.style.height = `${cellPct}%`;
+            actor.style.left = `${padPct + penguinPos.c * cellPct}%`;
+            actor.style.top = `${padPct + penguinPos.r * cellPct}%`;
+
+            sprite.style.transform = `rotate(${visualRotation}deg)`;
+        }
+
+        /**
+         * Agrega un comando relativo a la cadena de código
+         */
+        function addCommand(cmd) {
+            if (isRunning) return;
+            const level = LEVELS[currentLevelIdx];
+
+            if (commandQueue.length >= level.maxSlots) {
+                SFX.bump();
+                setFeedback(`¡Límite alcanzado! Máximo ${level.maxSlots} bloques en este nivel.`, 'warning');
+                return;
+            }
+
+            commandQueue.push(cmd);
+            SFX.click(cmd);
+            renderCodeSlots(-1, commandQueue.length - 1);
+
+            const btn = document.getElementById(`btn-dir-${cmd === 'FORWARD' ? 'UP' : cmd === 'BACKWARD' ? 'DOWN' : cmd === 'TURN_LEFT' ? 'LEFT' : 'RIGHT'}`);
+            if (btn) {
+                btn.classList.add('scale-95');
+                setTimeout(() => btn.classList.remove('scale-95'), 110);
+            }
+
+            const hints = {
+                FORWARD:    '⬆️ Adelante (avanza 1 paso hacia donde mira)',
+                BACKWARD:   '⬇️ Atrás (retrocede 1 paso sin girar)',
+                TURN_LEFT:  '⬅️ Girar Izquierda (gira 90° a su izquierda)',
+                TURN_RIGHT: '➡️ Girar Derecha (gira 90° a su derecha)'
+            };
+            setFeedback(`Bloque agregado: ${hints[cmd]}`, 'info');
+        }
+
+        /**
+         * Elimina el último bloque agregado
+         */
+        function removeLastCommand() {
+            if (isRunning || commandQueue.length === 0) return;
+            commandQueue.pop();
+            SFX.delete();
+            renderCodeSlots();
+            setFeedback('Se borró el último bloque.', 'info');
+        }
+
+        /**
+         * Elimina un bloque específico al hacer clic sobre él
+         */
+        function removeCommandAt(index) {
+            if (isRunning) return;
+            commandQueue.splice(index, 1);
+            SFX.delete();
+            renderCodeSlots();
+            setFeedback('Bloque eliminado de la secuencia.', 'info');
+        }
+
+        /**
+         * Limpia toda la secuencia y regresa al pingüino al inicio
+         */
+        function clearCommands() {
+            if (isRunning) return;
+            commandQueue = [];
+            SFX.delete();
+            resetPenguinToStart(LEVELS[currentLevelIdx]);
+            renderCodeSlots();
+            setFeedback('Tablero reiniciado. ¡Arma tu nueva cadena de código!', 'info');
+        }
+
+        /**
+         * Dibuja las casillas redondeadas inferiores con la cadena de comandos
+         */
+        function renderCodeSlots(activeIdx = -1, newlyAddedIdx = -1) {
+            const level = LEVELS[currentLevelIdx];
+            const container = document.getElementById('code-slots-container');
+            const counter = document.getElementById('step-counter');
+
+            const totalSlots = Math.max(level.optimalSteps, commandQueue.length);
+            counter.textContent = `${commandQueue.length} / ${level.maxSlots} bloques`;
+            container.innerHTML = '';
+
+            for (let i = 0; i < totalSlots; i++) {
+                const cmd = commandQueue[i];
+                const slot = document.createElement('button');
+                slot.type = 'button';
+
+                if (cmd) {
+                    const meta = CMD_META[cmd];
+                    const isActive = i === activeIdx;
+                    const isNew = i === newlyAddedIdx;
+
+                    slot.onclick = () => removeCommandAt(i);
+                    slot.title = `Paso ${i + 1}: ${meta.label} (Toca para quitar)`;
+                    slot.className = `relative w-12 h-14 sm:w-14 sm:h-16 rounded-2xl border-2 ${meta.border} ${meta.bg} ${meta.shadow} text-white flex flex-col items-center justify-center transition-all ${isNew ? 'block-pop' : ''} ${isActive ? 'ring-4 ring-yellow-300 scale-110 z-10' : 'hover:brightness-105'}`;
+
+                    slot.innerHTML = `
+                        <span class="absolute top-1 left-1.5 text-[10px] font-extrabold opacity-80">${i + 1}</span>
+                        <span class="text-xl sm:text-2xl leading-none mt-1">${meta.arrow}</span>
+                        <span class="text-[9px] font-extrabold tracking-tight mt-0.5">${meta.label}</span>
+                    `;
+                } else {
+                    slot.disabled = true;
+                    slot.className = 'w-12 h-14 sm:w-14 sm:h-16 rounded-2xl border-2 border-slate-400 bg-white flex flex-col items-center justify-center text-slate-300 font-bold text-xs shadow-inner';
+                    slot.innerHTML = `<span>${i + 1}</span>`;
+                }
+
+                container.appendChild(slot);
+            }
+        }
+
+        /**
+         * Calcula la nueva orientación tras girar 90° a la izquierda o derecha
+         */
+        function getTurnedDirection(currentDir, turnCmd) {
+            const idx = COMPASS_ORDER.indexOf(currentDir);
+            if (turnCmd === 'TURN_RIGHT') {
+                return COMPASS_ORDER[(idx + 1) % 4];
+            } else {
+                return COMPASS_ORDER[(idx + 3) % 4];
+            }
+        }
+
+        /**
+         * Calcula la dirección cardinal del desplazamiento (adelante o atrás) según adónde mira el pingüino
+         */
+        function getMoveCardinal(facingDir, moveCmd) {
+            if (moveCmd === 'FORWARD') return facingDir;
+            const idx = COMPASS_ORDER.indexOf(facingDir);
+            return COMPASS_ORDER[(idx + 2) % 4];
+        }
+
+        /**
+         * Verifica si el pingüino puede avanzar o retroceder en la dirección cardinal indicada
+         */
+        function canMove(level, r, c, cardinalDir) {
+            const N = level.size;
+            const { dr, dc } = DIR_VECTORS[cardinalDir];
+            const nr = r + dr;
+            const nc = c + dc;
+
+            if (nr < 0 || nr >= N || nc < 0 || nc >= N) {
+                return false;
+            }
+
+            if (cardinalDir === 'UP') {
+                return !level.hWalls.some(([wr, wc]) => wr === nr && wc === c);
+            }
+            if (cardinalDir === 'DOWN') {
+                return !level.hWalls.some(([wr, wc]) => wr === r && wc === c);
+            }
+            if (cardinalDir === 'LEFT') {
+                return !level.vWalls.some(([wr, wc]) => wr === r && wc === nc);
+            }
+            if (cardinalDir === 'RIGHT') {
+                return !level.vWalls.some(([wr, wc]) => wr === r && wc === c);
+            }
+            return false;
+        }
+
+        /**
+         * Ejecuta paso a paso la cadena de comandos programada por el estudiante
+         */
+        async function runSequence() {
+            if (isRunning) return;
+            if (commandQueue.length === 0) {
+                SFX.bump();
+                setFeedback('¡Primero presiona las flechas para agregar bloques abajo!', 'warning');
+                return;
+            }
+
+            isRunning = true;
+            setControlsDisabled(true);
+            const level = LEVELS[currentLevelIdx];
+
+            resetPenguinToStart(level);
+            setFeedback('🚀 Ejecutando tu programa...', 'info');
+            await sleep(320);
+
+            let r = level.start.r;
+            let c = level.start.c;
+            let dir = level.start.dir || 'UP';
+
+            for (let i = 0; i < commandQueue.length; i++) {
+                const cmd = commandQueue[i];
+                renderCodeSlots(i, -1);
+
+                if (cmd === 'TURN_LEFT' || cmd === 'TURN_RIGHT') {
+                    dir = getTurnedDirection(dir, cmd);
+                    visualRotation += (cmd === 'TURN_RIGHT' ? 90 : -90);
+                    penguinPos = { r, c, dir };
+                    updatePenguinVisual(true);
+                    SFX.turn();
+                    await sleep(430);
+                } else {
+                    const moveCardinal = getMoveCardinal(dir, cmd);
+
+                    if (!canMove(level, r, c, moveCardinal)) {
+                        SFX.bump();
+                        const sprite = document.getElementById('penguin-sprite');
+                        sprite.classList.add('shake-error');
+                        setFeedback(`💥 ¡Ups! En el paso ${i + 1} el pingüino chocó con una pared. ¡Corrige ese bloque!`, 'error');
+                        await sleep(650);
+                        sprite.classList.remove('shake-error');
+                        renderCodeSlots(-1, -1);
+                        isRunning = false;
+                        setControlsDisabled(false);
+                        return;
+                    }
+
+                    const { dr, dc } = DIR_VECTORS[moveCardinal];
+                    r += dr;
+                    c += dc;
+                    penguinPos = { r, c, dir };
+                    updatePenguinVisual(true);
+                    SFX.step();
+                    await sleep(450);
+                }
+            }
+
+            // Verificar si llegó exactamente a la celda de salida
+            if (r === level.exit.r && c === level.exit.c) {
+                renderCodeSlots(-1, -1);
+                SFX.victory();
+                completedLevels.add(level.id);
+                renderLevelSelector();
+                setFeedback('🎉 ¡Mr. Leo te felicita por tu logro! Vamos al siguiente Nivel.', 'success');
+                launchConfetti();
+                await sleep(500);
+                showVictoryModal(level);
+            } else {
+                SFX.bump();
+                renderCodeSlots(-1, -1);
+                setFeedback('🐟 ¡Casi llegas! Faltaron pasos o giros para alcanzar el pececito.', 'warning');
+            }
+
+            isRunning = false;
+            setControlsDisabled(false);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function setControlsDisabled(disabled) {
+            const ids = ['btn-dir-UP', 'btn-dir-DOWN', 'btn-dir-LEFT', 'btn-dir-RIGHT', 'btn-run', 'btn-undo', 'btn-clear'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = disabled;
+            });
+        }
+
+        function setFeedback(text, type = 'info') {
+            const banner = document.getElementById('feedback-banner');
+            banner.textContent = text;
+            banner.className = 'w-full min-h-[42px] sm:min-h-[44px] mb-2 rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-center font-bold text-xs sm:text-base flex items-center justify-center transition-all duration-200 border-2 ';
+
+            if (type === 'success') {
+                banner.className += 'bg-emerald-100 text-emerald-900 border-emerald-400';
+            } else if (type === 'error') {
+                banner.className += 'bg-rose-100 text-rose-900 border-rose-400';
+            } else if (type === 'warning') {
+                banner.className += 'bg-amber-100 text-amber-900 border-amber-400';
+            } else {
+                banner.className += 'bg-sky-50 text-sky-800 border-sky-200';
+            }
+        }
+
+        /**
+         * Soporte completo para las teclas direccionales del teclado, Backspace y Enter
+         */
+        function setupKeyboardListeners() {
+            window.addEventListener('keydown', (e) => {
+                const victoryOpen = !document.getElementById('victory-modal').classList.contains('hidden');
+                const helpOpen = !document.getElementById('help-modal').classList.contains('hidden');
+
+                if (victoryOpen) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        nextLevel();
+                    }
+                    return;
+                }
+                if (helpOpen) {
+                    if (e.key === 'Escape' || e.key === 'Enter') {
+                        e.preventDefault();
+                        closeHelpModal();
+                    }
+                    return;
+                }
+
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                    e.preventDefault();
+                }
+
+                if (isRunning) return;
+
+                switch (e.key) {
+                    case 'ArrowUp':
+                        addCommand('FORWARD');
+                        break;
+                    case 'ArrowDown':
+                        addCommand('BACKWARD');
+                        break;
+                    case 'ArrowLeft':
+                        addCommand('TURN_LEFT');
+                        break;
+                    case 'ArrowRight':
+                        addCommand('TURN_RIGHT');
+                        break;
+                    case 'Backspace':
+                    case 'Delete':
+                        removeLastCommand();
+                        break;
+                    case 'Enter':
+                        runSequence();
+                        break;
+                    case 'Escape':
+                        clearCommands();
+                        break;
+                }
+            });
+        }
+
+        /**
+         * Modales de Victoria y Ayuda
+         */
+        function showVictoryModal(level) {
+            const modal = document.getElementById('victory-modal');
+            const title = document.getElementById('victory-title');
+            const subtitle = document.getElementById('victory-subtitle');
+            const stars = document.getElementById('victory-stars');
+            const summary = document.getElementById('victory-code-summary');
+            const nextBtn = document.getElementById('btn-next-level');
+
+            const isOptimal = commandQueue.length <= level.optimalSteps;
+            title.textContent = '¡Mr. Leo te felicita por tu logro!';
+
+            subtitle.textContent = currentLevelIdx === LEVELS.length - 1
+                ? `¡Completaste los 10 niveles con ${commandQueue.length} bloques! ¡Eres un gran programador!`
+                : `¡Vamos al siguiente Nivel! Lo resolviste con ${commandQueue.length} bloques.`;
+
+            stars.innerHTML = isOptimal
+                ? '<span>⭐</span><span>⭐</span><span>⭐</span>'
+                : '<span>⭐</span><span>⭐</span><span class="opacity-40">⭐</span>';
+
+            summary.innerHTML = commandQueue.map(cmd =>
+                `<span class="bg-white border border-sky-300 rounded-lg px-2 py-0.5 shadow-sm font-bold">${CMD_META[cmd].arrow}</span>`
+            ).join('');
+
+            if (currentLevelIdx >= LEVELS.length - 1) {
+                nextBtn.innerHTML = '<span>Volver al Nivel 1</span> <span>🔄</span>';
+            } else {
+                nextBtn.innerHTML = '<span>Vamos al siguiente Nivel</span> <span>➡️</span>';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeVictoryModal() {
+            const modal = document.getElementById('victory-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function replayLevel() {
+            closeVictoryModal();
+            loadLevel(currentLevelIdx);
+        }
+
+        function nextLevel() {
+            closeVictoryModal();
+            if (currentLevelIdx < LEVELS.length - 1) {
+                loadLevel(currentLevelIdx + 1);
+            } else {
+                loadLevel(0);
+            }
+        }
+
+        function openHelpModal() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeHelpModal() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function toggleSound() {
+            SFX.enabled = !SFX.enabled;
+            document.getElementById('sound-icon').textContent = SFX.enabled ? '🔊' : '🔇';
+            document.getElementById('sound-label').textContent = SFX.enabled ? 'Sonido' : 'Silencio';
+            if (SFX.enabled) SFX.click('FORWARD');
+        }
+
+        /**
+         * Lluvia festiva de confeti al superar un nivel
+         */
+        function launchConfetti() {
+            const colors = ['#38BDF8', '#FBBF24', '#34D399', '#F472B6', '#A78BFA'];
+            for (let i = 0; i < 36; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = `${Math.random() * 100}vw`;
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(piece);
+
+                const fallDuration = 1400 + Math.random() * 1200;
+                const drift = (Math.random() - 0.5) * 160;
+
+                piece.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${drift}px, 100vh) rotate(${360 + Math.random() * 360}deg)`, opacity: 0.2 }
+                ], {
+                    duration: fallDuration,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+
+                setTimeout(() => piece.remove(), fallDuration);
+            }
+        }
+    </script>
+</body>
+</html>
