@@ -96,16 +96,16 @@
         }
     </style>
 </head>
-<body class="text-slate-800 flex flex-col justify-between min-h-screen w-full">
+<body class="text-slate-800 flex flex-col justify-between min-h-[100dvh] w-full">
 
-    <!-- ENCABEZADO Y SELECTOR DE NIVELES -->
-    <header class="w-full max-w-5xl mx-auto px-2.5 sm:px-4 pt-2.5 sm:pt-3 pb-1.5">
-        <div class="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-lg border-4 border-sky-200 p-3 md:px-6 flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3">
-            <!-- Título, Docente Mr. Leo e Icono -->
-            <div class="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto justify-center md:justify-start text-center md:text-left">
-                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-sky-500 flex items-center justify-center shadow-md border-2 border-sky-600 shrink-0">
+    <!-- ENCABEZADO COMPACTO Y SELECTOR DE NIVELES -->
+    <header class="w-full max-w-5xl mx-auto px-2 sm:px-4 pt-1.5 sm:pt-3 pb-1">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-md border-2 sm:border-4 border-sky-200 px-2.5 py-1.5 sm:p-3 md:px-6 flex items-center justify-between gap-2">
+            <!-- Título e Icono -->
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-sky-500 flex items-center justify-center shadow-sm border-2 border-sky-600 shrink-0">
                     <!-- Mini Pingüino SVG mirando al frente -->
-                    <svg viewBox="0 0 64 64" class="w-8 h-8 sm:w-9 sm:h-9">
+                    <svg viewBox="0 0 64 64" class="w-6 h-6 sm:w-9 sm:h-9">
                         <ellipse cx="32" cy="34" rx="18" ry="20" fill="#1E293B"/>
                         <ellipse cx="32" cy="38" rx="12" ry="14" fill="#FFFFFF"/>
                         <circle cx="26" cy="24" r="3" fill="#FFFFFF"/>
@@ -118,66 +118,64 @@
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
-                        <h1 class="text-base sm:text-xl md:text-2xl font-bold text-sky-900 leading-tight">
-                            Mr. Leo te preparó la Aventura del Pingüino Programador
-                        </h1>
-                    </div>
-                    <p class="text-[11px] sm:text-sm font-bold text-sky-600 mt-0.5">¡Imagina que estás dentro del pingüino! Gira a tu lado y avanza al frente</p>
+                    <h1 class="text-[13px] sm:text-xl md:text-2xl font-bold text-sky-900 leading-tight truncate sm:whitespace-normal">
+                        Mr. Leo te preparó la Aventura del Pingüino Programador
+                    </h1>
+                    <p class="hidden sm:block text-xs sm:text-sm font-bold text-sky-600 mt-0.5">¡Imagina que estás dentro del pingüino! Gira a tu lado y avanza al frente</p>
                 </div>
             </div>
 
-            <!-- Controles Superiores: Sonido y Ayuda -->
-            <div class="flex items-center justify-center gap-2 shrink-0 w-full md:w-auto">
+            <!-- Controles Superiores Compactos: Sonido y Ayuda -->
+            <div class="flex items-center gap-1.5 shrink-0">
                 <button id="btn-sound" onclick="toggleSound()" title="Activar o silenciar sonidos"
-                    class="btn-3d bg-amber-100 hover:bg-amber-200 text-amber-800 border-2 border-amber-300 shadow-[0_3px_0_#FCD34D] rounded-xl sm:rounded-2xl px-3 py-1.5 sm:py-2 font-bold text-xs sm:text-sm flex items-center gap-1.5">
-                    <span id="sound-icon" class="text-base sm:text-lg">🔊</span>
-                    <span id="sound-label">Sonido</span>
+                    class="btn-3d bg-amber-100 hover:bg-amber-200 text-amber-800 border-2 border-amber-300 shadow-[0_2px_0_#FCD34D] rounded-xl px-2 py-1 sm:px-3 sm:py-2 font-bold text-xs sm:text-sm flex items-center gap-1">
+                    <span id="sound-icon" class="text-sm sm:text-lg leading-none">🔊</span>
+                    <span id="sound-label" class="hidden sm:inline">Sonido</span>
                 </button>
                 <button onclick="openHelpModal()" title="¿Cómo jugar?"
-                    class="btn-3d bg-sky-100 hover:bg-sky-200 text-sky-800 border-2 border-sky-300 shadow-[0_3px_0_#7DD3FC] rounded-xl sm:rounded-2xl px-3 py-1.5 sm:py-2 font-bold text-xs sm:text-sm flex items-center gap-1.5">
-                    <span class="text-base sm:text-lg">💡</span>
-                    <span>Ayuda</span>
+                    class="btn-3d bg-sky-100 hover:bg-sky-200 text-sky-800 border-2 border-sky-300 shadow-[0_2px_0_#7DD3FC] rounded-xl px-2 py-1 sm:px-3 sm:py-2 font-bold text-xs sm:text-sm flex items-center gap-1">
+                    <span class="text-sm sm:text-lg leading-none">💡</span>
+                    <span class="hidden sm:inline">Ayuda</span>
                 </button>
             </div>
         </div>
 
         <!-- BARRA DE 10 NIVELES -->
-        <div class="mt-2.5 bg-white/85 rounded-2xl p-2 border-2 border-sky-200 shadow-sm flex items-center gap-2 overflow-x-auto no-scrollbar">
-            <span class="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-sky-800 px-1.5 shrink-0">Niveles:</span>
-            <div id="level-selector" class="flex items-center gap-1.5 w-full justify-start sm:justify-between">
+        <div class="mt-1.5 sm:mt-2.5 bg-white/85 rounded-xl sm:rounded-2xl px-2 py-1 sm:p-2 border-2 border-sky-200 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <span class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-sky-800 px-1 shrink-0">Niveles:</span>
+            <div id="level-selector" class="flex items-center gap-1 sm:gap-1.5 w-full justify-between">
                 <!-- Botones del 1 al 10 generados por JS -->
             </div>
         </div>
     </header>
 
     <!-- ÁREA PRINCIPAL DEL JUEGO -->
-    <main class="w-full max-w-5xl mx-auto px-2.5 sm:px-4 py-1.5 sm:py-2 flex-grow flex flex-col gap-2.5 sm:gap-3">
+    <main class="w-full max-w-5xl mx-auto px-2 sm:px-4 py-1 sm:py-2 flex-grow flex flex-col justify-between gap-1.5 sm:gap-3">
         
         <!-- SECCIÓN SUPERIOR: TABLERO DEL LABERINTO + PANEL DE COMANDOS -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-stretch md:items-center">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-1.5 sm:gap-4 items-center">
             
             <!-- COLUMNA IZQUIERDA (7 cols): LABERINTO -->
             <div class="md:col-span-7 flex flex-col items-center">
-                <div class="w-full bg-white rounded-2xl sm:rounded-3xl shadow-xl border-4 border-slate-200 p-2.5 sm:p-5 flex flex-col items-center relative">
+                <div class="w-full bg-white rounded-2xl sm:rounded-3xl shadow-lg border-2 sm:border-4 border-slate-200 p-2 sm:p-5 flex flex-col items-center relative">
                     
                     <!-- Encabezado del Nivel -->
-                    <div class="w-full flex items-center justify-between gap-2 mb-2 px-1">
-                        <span id="level-badge" class="bg-sky-500 text-white font-display font-bold px-3 py-1 rounded-full text-xs sm:text-base shadow-sm">
+                    <div class="w-full flex items-center justify-between gap-2 mb-1 sm:mb-2 px-0.5">
+                        <span id="level-badge" class="bg-sky-500 text-white font-display font-bold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-base shadow-sm">
                             Nivel 1 de 10
                         </span>
-                        <span id="level-hint-badge" class="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
+                        <span id="level-hint-badge" class="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-sm">
                             Meta: 15 bloques
                         </span>
                     </div>
 
                     <!-- Banner de Retroalimentación / Mensajes amigables -->
-                    <div id="feedback-banner" class="w-full min-h-[42px] sm:min-h-[44px] mb-2 rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-center font-bold text-xs sm:text-base flex items-center justify-center transition-all duration-200 bg-sky-50 text-sky-800 border-2 border-sky-200">
+                    <div id="feedback-banner" class="w-full min-h-[30px] sm:min-h-[44px] mb-1 sm:mb-2 rounded-xl sm:rounded-2xl px-2 py-1 sm:px-3 sm:py-2 text-center font-bold text-[11px] sm:text-base leading-tight flex items-center justify-center transition-all duration-200 bg-sky-50 text-sky-800 border border-sky-200 sm:border-2">
                         ¡Usa las flechas: ⬆️ Adelante, ⬇️ Atrás, ⬅️ Girar Izquierda, ➡️ Girar Derecha!
                     </div>
 
                     <!-- CONTENEDOR DEL LABERINTO (SVG + Pingüino animado) -->
-                    <div id="maze-wrapper" class="relative w-full max-w-[310px] sm:max-w-[370px] md:max-w-[400px] aspect-square bg-white rounded-2xl p-1.5 sm:p-2 flex items-center justify-center">
+                    <div id="maze-wrapper" class="relative w-[min(64vw,225px)] sm:w-full sm:max-w-[370px] md:max-w-[400px] aspect-square bg-white rounded-xl sm:rounded-2xl p-1 sm:p-2 flex items-center justify-center">
                         <!-- SVG donde se dibujan las paredes gruesas gris oscuro estilo ficha escolar -->
                         <svg id="maze-svg" viewBox="0 0 400 400" class="w-full h-full overflow-visible">
                             <!-- Capa de cuadrícula suave de ayuda -->
@@ -223,63 +221,63 @@
             </div>
 
             <!-- COLUMNA DERECHA (5 cols): CONTROL DIRECCIONAL Y EJECUCIÓN -->
-            <div class="md:col-span-5 flex flex-col gap-3">
-                <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border-4 border-sky-200 p-3 sm:p-4 flex flex-col items-center">
-                    <h2 class="text-base sm:text-lg font-bold text-sky-900 mb-0.5 sm:mb-1 flex items-center gap-2">
+            <div class="md:col-span-5 flex flex-col gap-1.5 sm:gap-3">
+                <div class="bg-white rounded-2xl sm:rounded-3xl shadow-lg border-2 sm:border-4 border-sky-200 p-2 sm:p-4 flex flex-col items-center">
+                    <h2 class="hidden sm:flex text-base sm:text-lg font-bold text-sky-900 mb-1 items-center gap-2">
                         <span>🎮</span> Comandos del Pingüino
                     </h2>
-                    <p class="text-[11px] sm:text-xs text-slate-500 font-bold mb-2.5 sm:mb-3 text-center">
+                    <p class="hidden sm:block text-xs text-slate-500 font-bold mb-3 text-center">
                         ⬆️⬇️ Avanzan o retroceden • ⬅️➡️ Giran sobre su lugar
                     </p>
 
-                    <!-- Cruceta de Dirección Grande para Niños (Flechas como en el teclado de computadora) -->
-                    <div class="grid grid-cols-3 gap-2 sm:gap-2.5 w-full max-w-[270px] sm:max-w-[290px] my-1">
+                    <!-- Cruceta de Dirección Compacta en Móvil y Grande en Tablet/PC -->
+                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2.5 w-full max-w-[235px] sm:max-w-[290px]">
                         <div></div>
                         <!-- ADELANTE (Avanza hacia donde mira) -->
                         <button id="btn-dir-UP" onclick="addCommand('FORWARD')"
-                            class="btn-3d bg-sky-500 hover:bg-sky-400 text-white border-2 border-sky-600 shadow-[0_4px_0_#0284C7] sm:shadow-[0_5px_0_#0284C7] rounded-2xl py-2.5 sm:py-3 px-2 flex flex-col items-center justify-center touch-manipulation">
-                            <span class="text-2xl sm:text-3xl leading-none">⬆️</span>
-                            <span class="text-[11px] sm:text-xs font-extrabold mt-1">Adelante</span>
+                            class="btn-3d bg-sky-500 hover:bg-sky-400 text-white border-2 border-sky-600 shadow-[0_3px_0_#0284C7] sm:shadow-[0_5px_0_#0284C7] rounded-xl sm:rounded-2xl py-1.5 sm:py-3 px-1.5 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-lg sm:text-3xl leading-none">⬆️</span>
+                            <span class="text-[10px] sm:text-xs font-extrabold mt-0.5 sm:mt-1">Adelante</span>
                         </button>
                         <div></div>
 
                         <!-- GIRAR IZQUIERDA (Flecha normal izquierda como teclado) -->
                         <button id="btn-dir-LEFT" onclick="addCommand('TURN_LEFT')"
-                            class="btn-3d bg-indigo-500 hover:bg-indigo-400 text-white border-2 border-indigo-600 shadow-[0_4px_0_#4338CA] sm:shadow-[0_5px_0_#4338CA] rounded-2xl py-2.5 sm:py-3 px-1.5 flex flex-col items-center justify-center touch-manipulation">
-                            <span class="text-2xl sm:text-3xl leading-none">⬅️</span>
-                            <span class="text-[10px] sm:text-[11px] font-extrabold mt-1 leading-tight">Girar Izq.</span>
+                            class="btn-3d bg-indigo-500 hover:bg-indigo-400 text-white border-2 border-indigo-600 shadow-[0_3px_0_#4338CA] sm:shadow-[0_5px_0_#4338CA] rounded-xl sm:rounded-2xl py-1.5 sm:py-3 px-1 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-lg sm:text-3xl leading-none">⬅️</span>
+                            <span class="text-[9px] sm:text-[11px] font-extrabold mt-0.5 sm:mt-1 leading-tight">Girar Izq.</span>
                         </button>
 
                         <!-- ATRÁS (Retrocede sin girar) -->
                         <button id="btn-dir-DOWN" onclick="addCommand('BACKWARD')"
-                            class="btn-3d bg-amber-500 hover:bg-amber-400 text-white border-2 border-amber-600 shadow-[0_4px_0_#D97706] sm:shadow-[0_5px_0_#D97706] rounded-2xl py-2.5 sm:py-3 px-2 flex flex-col items-center justify-center touch-manipulation">
-                            <span class="text-2xl sm:text-3xl leading-none">⬇️</span>
-                            <span class="text-[11px] sm:text-xs font-extrabold mt-1">Atrás</span>
+                            class="btn-3d bg-amber-500 hover:bg-amber-400 text-white border-2 border-amber-600 shadow-[0_3px_0_#D97706] sm:shadow-[0_5px_0_#D97706] rounded-xl sm:rounded-2xl py-1.5 sm:py-3 px-1.5 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-lg sm:text-3xl leading-none">⬇️</span>
+                            <span class="text-[10px] sm:text-xs font-extrabold mt-0.5 sm:mt-1">Atrás</span>
                         </button>
 
                         <!-- GIRAR DERECHA (Flecha normal derecha como teclado) -->
                         <button id="btn-dir-RIGHT" onclick="addCommand('TURN_RIGHT')"
-                            class="btn-3d bg-teal-500 hover:bg-teal-400 text-white border-2 border-teal-600 shadow-[0_4px_0_#0F766E] sm:shadow-[0_5px_0_#0F766E] rounded-2xl py-2.5 sm:py-3 px-1.5 flex flex-col items-center justify-center touch-manipulation">
-                            <span class="text-2xl sm:text-3xl leading-none">➡️</span>
-                            <span class="text-[10px] sm:text-[11px] font-extrabold mt-1 leading-tight">Girar Der.</span>
+                            class="btn-3d bg-teal-500 hover:bg-teal-400 text-white border-2 border-teal-600 shadow-[0_3px_0_#0F766E] sm:shadow-[0_5px_0_#0F766E] rounded-xl sm:rounded-2xl py-1.5 sm:py-3 px-1 flex flex-col items-center justify-center touch-manipulation">
+                            <span class="text-lg sm:text-3xl leading-none">➡️</span>
+                            <span class="text-[9px] sm:text-[11px] font-extrabold mt-0.5 sm:mt-1 leading-tight">Girar Der.</span>
                         </button>
                     </div>
 
-                    <!-- Botones de Acción: Ejecutar, Borrar Último, Reiniciar -->
-                    <div class="w-full flex flex-col gap-2 sm:gap-2.5 mt-3 sm:mt-4">
+                    <!-- Botones de Acción: Ejecutar, Borrar Último, Reiniciar (En una sola fila compacta en móvil) -->
+                    <div class="w-full grid grid-cols-12 sm:flex sm:flex-col gap-1.5 sm:gap-2.5 mt-2 sm:mt-4">
                         <button id="btn-run" onclick="runSequence()"
-                            class="btn-3d w-full bg-emerald-500 hover:bg-emerald-400 text-white border-2 border-emerald-600 shadow-[0_4px_0_#059669] sm:shadow-[0_5px_0_#059669] rounded-2xl py-3 sm:py-3.5 px-4 font-display font-bold text-base sm:text-xl flex items-center justify-center gap-2 tracking-wide touch-manipulation">
+                            class="col-span-6 btn-3d w-full bg-emerald-500 hover:bg-emerald-400 text-white border-2 border-emerald-600 shadow-[0_3px_0_#059669] sm:shadow-[0_5px_0_#059669] rounded-xl sm:rounded-2xl py-2 sm:py-3.5 px-2 sm:px-4 font-display font-bold text-sm sm:text-xl flex items-center justify-center gap-1.5 tracking-wide touch-manipulation">
                             <span>▶️</span> Ejecutar
                         </button>
 
-                        <div class="grid grid-cols-2 gap-2 sm:gap-2.5">
+                        <div class="col-span-6 grid grid-cols-2 gap-1.5 sm:gap-2.5">
                             <button id="btn-undo" onclick="removeLastCommand()"
-                                class="btn-3d bg-orange-100 hover:bg-orange-200 text-orange-800 border-2 border-orange-300 shadow-[0_4px_0_#FDBA74] rounded-2xl py-2.5 px-2.5 sm:px-3 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 touch-manipulation">
-                                <span>⌫</span> Borrar
+                                class="btn-3d bg-orange-100 hover:bg-orange-200 text-orange-800 border-2 border-orange-300 shadow-[0_3px_0_#FDBA74] rounded-xl sm:rounded-2xl py-2 sm:py-2.5 px-1.5 sm:px-3 font-bold text-[11px] sm:text-sm flex items-center justify-center gap-1 touch-manipulation">
+                                <span>⌫</span> <span class="hidden xs:inline sm:inline">Borrar</span>
                             </button>
                             <button id="btn-clear" onclick="clearCommands()"
-                                class="btn-3d bg-rose-100 hover:bg-rose-200 text-rose-800 border-2 border-rose-300 shadow-[0_4px_0_#FDA4AF] rounded-2xl py-2.5 px-2.5 sm:px-3 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 touch-manipulation">
-                                <span>🔄</span> Reiniciar
+                                class="btn-3d bg-rose-100 hover:bg-rose-200 text-rose-800 border-2 border-rose-300 shadow-[0_3px_0_#FDA4AF] rounded-xl sm:rounded-2xl py-2 sm:py-2.5 px-1.5 sm:px-3 font-bold text-[11px] sm:text-sm flex items-center justify-center gap-1 touch-manipulation">
+                                <span>🔄</span> <span class="hidden xs:inline sm:inline">Reiniciar</span>
                             </button>
                         </div>
                     </div>
@@ -287,23 +285,23 @@
             </div>
         </div>
 
-        <!-- SECCIÓN INFERIOR: CADENA DE CÓDIGO (CASILLAS REDONDEADAS COMO EN LA FICHA) -->
-        <section class="w-full bg-white rounded-2xl sm:rounded-3xl shadow-xl border-4 border-slate-200 p-2.5 sm:p-4 mb-2">
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
-                <div class="flex items-center gap-1.5 sm:gap-2">
-                    <span class="text-lg sm:text-xl">🧩</span>
-                    <h2 class="text-sm sm:text-lg font-bold text-slate-800">Tu Cadena de Código:</h2>
+        <!-- SECCIÓN INFERIOR: CADENA DE CÓDIGO (CASILLAS REDONDEADAS COMPACTAS) -->
+        <section class="w-full bg-white rounded-2xl sm:rounded-3xl shadow-lg border-2 sm:border-4 border-slate-200 p-2 sm:p-4 mb-1">
+            <div class="flex items-center justify-between gap-2 mb-1 sm:mb-2 px-0.5">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-base sm:text-xl">🧩</span>
+                    <h2 class="text-xs sm:text-lg font-bold text-slate-800">Tu Cadena de Código:</h2>
                 </div>
-                <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-bold">
+                <div class="flex items-center gap-2 text-[11px] sm:text-sm font-bold">
                     <span class="hidden sm:inline text-slate-500">Toca un bloque para quitarlo</span>
-                    <span id="step-counter" class="bg-sky-100 text-sky-800 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-sky-300">
+                    <span id="step-counter" class="bg-sky-100 text-sky-800 px-2 sm:px-3 py-0.5 rounded-full border border-sky-300">
                         0 / 15 bloques
                     </span>
                 </div>
             </div>
 
             <!-- Contenedor de los cuadros redondeados secuenciales -->
-            <div id="code-slots-container" class="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2.5 min-h-[68px] sm:min-h-[76px] p-2 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300">
+            <div id="code-slots-container" class="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-2.5 min-h-[48px] sm:min-h-[76px] p-1.5 sm:p-2 bg-slate-50 rounded-xl sm:rounded-2xl border-2 border-dashed border-slate-300">
                 <!-- Generado dinámicamente por JS -->
             </div>
         </section>
@@ -607,13 +605,13 @@
                     if (!isRunning) loadLevel(idx);
                 };
 
-                let classes = 'btn-3d w-8 h-8 sm:w-10 sm:h-10 rounded-xl font-display font-bold text-xs sm:text-base flex items-center justify-center shrink-0 border-2 ';
+                let classes = 'btn-3d w-6 h-6 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl font-display font-bold text-[11px] sm:text-base flex items-center justify-center shrink-0 border-2 ';
                 if (isCurrent) {
-                    classes += 'bg-sky-500 text-white border-sky-700 shadow-[0_3px_0_#0369A1] scale-105';
+                    classes += 'bg-sky-500 text-white border-sky-700 shadow-[0_2px_0_#0369A1] sm:shadow-[0_3px_0_#0369A1] scale-105';
                 } else if (isDone) {
-                    classes += 'bg-emerald-100 text-emerald-800 border-emerald-400 shadow-[0_3px_0_#34D399]';
+                    classes += 'bg-emerald-100 text-emerald-800 border-emerald-400 shadow-[0_2px_0_#34D399] sm:shadow-[0_3px_0_#34D399]';
                 } else {
-                    classes += 'bg-slate-100 hover:bg-sky-100 text-slate-700 border-slate-300 shadow-[0_3px_0_#CBD5E1]';
+                    classes += 'bg-slate-100 hover:bg-sky-100 text-slate-700 border-slate-300 shadow-[0_2px_0_#CBD5E1] sm:shadow-[0_3px_0_#CBD5E1]';
                 }
 
                 btn.className = classes;
@@ -895,16 +893,16 @@
 
                     slot.onclick = () => removeCommandAt(i);
                     slot.title = `Paso ${i + 1}: ${meta.label} (Toca para quitar)`;
-                    slot.className = `relative w-12 h-14 sm:w-14 sm:h-16 rounded-2xl border-2 ${meta.border} ${meta.bg} ${meta.shadow} text-white flex flex-col items-center justify-center transition-all ${isNew ? 'block-pop' : ''} ${isActive ? 'ring-4 ring-yellow-300 scale-110 z-10' : 'hover:brightness-105'}`;
+                    slot.className = `relative w-10 h-11 sm:w-14 sm:h-16 rounded-xl sm:rounded-2xl border-2 ${meta.border} ${meta.bg} ${meta.shadow} text-white flex flex-col items-center justify-center transition-all ${isNew ? 'block-pop' : ''} ${isActive ? 'ring-4 ring-yellow-300 scale-110 z-10' : 'hover:brightness-105'}`;
 
                     slot.innerHTML = `
-                        <span class="absolute top-1 left-1.5 text-[10px] font-extrabold opacity-80">${i + 1}</span>
-                        <span class="text-xl sm:text-2xl leading-none mt-1">${meta.arrow}</span>
-                        <span class="text-[9px] font-extrabold tracking-tight mt-0.5">${meta.label}</span>
+                        <span class="absolute top-0.5 left-1 text-[8px] sm:text-[10px] font-extrabold opacity-80">${i + 1}</span>
+                        <span class="text-base sm:text-2xl leading-none mt-1">${meta.arrow}</span>
+                        <span class="hidden sm:block text-[9px] font-extrabold tracking-tight mt-0.5">${meta.label}</span>
                     `;
                 } else {
                     slot.disabled = true;
-                    slot.className = 'w-12 h-14 sm:w-14 sm:h-16 rounded-2xl border-2 border-slate-400 bg-white flex flex-col items-center justify-center text-slate-300 font-bold text-xs shadow-inner';
+                    slot.className = 'w-10 h-11 sm:w-14 sm:h-16 rounded-xl sm:rounded-2xl border-2 border-slate-400 bg-white flex flex-col items-center justify-center text-slate-300 font-bold text-[10px] sm:text-xs shadow-inner';
                     slot.innerHTML = `<span>${i + 1}</span>`;
                 }
 
